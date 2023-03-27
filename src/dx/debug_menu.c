@@ -230,28 +230,25 @@ void dx_debug_menu_cb_gotomap_entry_picker(void* arg);
 
 void dx_debug_menu_cb_gotomap_entry_picker(void* arg) {
     MapConfig* map = arg;
-    struct dx_debug_menu_item* items;
+    struct dx_debug_menu_item* items = general_heap_malloc((map->settings->entryCount + 1) * sizeof(dx_debug_menu_item));
     int i;
     
-// need to get map out of arg somehow
-    for (i = 0; i < map->settings->entryList; i++) {
-        char* str = general_heap_malloc(sizeof(char*));
+    for (i = 0; i < map->settings->entryCount; i++) {
+        char* str = general_heap_malloc(4 * sizeof(char));
         sprintf(str, "%d", i);
         dx_debugMenu.items[i].name = str;
         dx_debugMenu.items[i].callback = dx_debug_menu_cb_gotomap_execute;
-        dx_debugMenu.items[i].callbackArg = i; // and probably map too?
+        dx_debugMenu.items[i].callbackArg = i; // ?
     }
 
-    dx_debugMenu.items[i].name = NULL;
-    dx_debugMenu.items[i].callback = NULL;
+    items[i].name = NULL;
+    items[i].callback = NULL;
 
     dx_debug_menu_push();
     dx_debugMenu.title = "Pick Entry";
     dx_debugMenu.items = items;
-
-// dx_debug_menu_cb_gotomap_entry_picked needs to free items[i].name also
-// ty alex :mariopray:
 }
+// dx_debug_menu_cb_gotomap_execute needs to free items[i].name also, since its malloced. same with going back...yay memory leaks
 
 // Callback for when you pick an area on the "Go to map" menu
 // Lists the maps in that area
